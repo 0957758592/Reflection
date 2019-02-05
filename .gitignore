@@ -1,0 +1,11 @@
+/.idea
+/target
+/src/main/resources
+/src/main/java/com/reflection/queryGenerator
+/src/main/java/com/reflection/annotation
+/src/main/java/com/reflection/TestMain.java
+/src/main/java/com/reflection/X.java
+
+*.iml
+*.class
+*.txt
