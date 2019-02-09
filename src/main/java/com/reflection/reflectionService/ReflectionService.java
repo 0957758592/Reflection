@@ -79,15 +79,20 @@ public class ReflectionService {
         checkIfIsNotNull(clazz);
         isClassExist(clazz.getName());
 
-        clazz.getSuperclass();
-
-        for (Class<?> aClass : clazz.getInterfaces()) {
-            System.out.println(aClass.getName());
+            for (Class<?> aClass : clazz.getInterfaces()) {
+                System.out.println(aClass.getName());
         }
+
+        if (clazz.getSuperclass() != null) {
+            Class superClass = clazz.getSuperclass();
+            System.out.println(superClass.getSimpleName());
+            pintAllClassRelativesAndInterfaces(superClass);
+        }
+
 
     }
 
-    //7 ???
+    //7
     public void modifyPrivateFields(Class<?> clazz) throws IllegalAccessException, InstantiationException {
         checkIfIsNotNull(clazz);
         isClassExist(clazz.getName());
@@ -101,7 +106,29 @@ public class ReflectionService {
                 instance = clazz.newInstance();
 
                 field.setAccessible(true);
-                field.set(instance, field.getType());
+
+                if (field.getType().equals(String.class)) {
+                    field.set(instance, null);
+                } else if (field.getType().equals(Integer.class)) {
+                    field.set(instance, 0);
+                } else if (field.getType().equals(Boolean.class)) {
+                    field.set(instance, false);
+                } else if (field.getType().equals(Double.class)) {
+                    field.set(instance, 0.0);
+                } else if (field.getType().equals(Float.class)) {
+                    field.set(instance, 0f);
+                } else if (field.getType().equals(Long.class)) {
+                    field.set(instance, 0L);
+                } else if (field.getType().equals(Character.class)) {
+                    field.set(instance, (char) 0);
+                } else if (field.getType().equals(int.class)) {
+                    field.set(instance, 0);
+                } else if (field.getType().equals(Short.class)) {
+                    field.set(instance, (short) 0);
+                } else if (field.getType().equals(Byte.class)) {
+                    field.set(instance, (byte) 0);
+                }
+
                 field.setAccessible(false);
             }
 

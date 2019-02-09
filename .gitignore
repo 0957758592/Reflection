@@ -5,6 +5,7 @@
 /src/main/java/com/reflection/annotation
 /src/main/java/com/reflection/TestMain.java
 /src/main/java/com/reflection/X.java
+/src/main/java/com/reflection/myInterface.java
 
 *.iml
 *.class
