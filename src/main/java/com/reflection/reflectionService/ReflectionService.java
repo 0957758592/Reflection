@@ -1,8 +1,11 @@
 package com.reflection.reflectionService;
 
+import com.reflection.AbstractClassChecker;
+
 import java.lang.reflect.*;
 
-public class ReflectionService {
+
+public class ReflectionService extends AbstractClassChecker {
 
     //1
     public Object getClassInstance(String name) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
@@ -79,8 +82,8 @@ public class ReflectionService {
         checkIfIsNotNull(clazz);
         isClassExist(clazz.getName());
 
-            for (Class<?> aClass : clazz.getInterfaces()) {
-                System.out.println(aClass.getName());
+        for (Class<?> aClass : clazz.getInterfaces()) {
+            System.out.println(aClass.getName());
         }
 
         if (clazz.getSuperclass() != null) {
@@ -88,7 +91,6 @@ public class ReflectionService {
             System.out.println(superClass.getSimpleName());
             pintAllClassRelativesAndInterfaces(superClass);
         }
-
 
     }
 
@@ -136,6 +138,7 @@ public class ReflectionService {
 
     }
 
+
     private void checkIfIsNotNull(Object object) {
         if (object == null) {
             throw new IllegalArgumentException("The object can't be a null");
@@ -152,13 +155,6 @@ public class ReflectionService {
         return (object instanceof Class) ? (Class) object : object.getClass();
     }
 
-    private void isClassExist(String name) {
-        try {
-            Class.forName(name);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
     private Method[] getClassMethods(Class clazz) {
         Method[] methods = clazz.getDeclaredMethods();
@@ -169,13 +165,5 @@ public class ReflectionService {
         return methods;
     }
 
-    private Field[] getClassFields(Class clazz) {
-        Field[] fields = clazz.getDeclaredFields();
-
-        if (fields == null) {
-            throw new NullPointerException("There are no any fields  at the class");
-        }
-        return fields;
-    }
 
 }
