@@ -133,11 +133,9 @@ public class ReflectionService extends AbstractClassChecker {
 
                 field.setAccessible(false);
             }
-
         }
 
     }
-
 
     private void checkIfIsNotNull(Object object) {
         if (object == null) {

@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 
 public class ReflectionServiceTest {
 
-    private class testClass implements myInteface {
+    static class TestClass implements myInteface {
         private String string = "string";
         private Integer integer = Integer.MAX_VALUE;
         private int intz = 123;
@@ -78,18 +78,17 @@ public class ReflectionServiceTest {
         Byte getByte();
     }
 
-    String className = testClass.class.getSimpleName();
+    String className = TestClass.class.getName();
+    Object sReflectionService;
 
     @Before
-    public void before() {
-
-
+    public void before() throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+      sReflectionService =  ReflectionService.class.getDeclaredMethod("getClassInstance", String.class).invoke(ReflectionService.class.newInstance(), className);
     }
 
     @Test
-    public void getClassInstance() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        System.out.println(ReflectionService.class.getDeclaredMethod("getClassInstance", String.class).invoke(className));
-        assertEquals(testClass.class, ReflectionService.class.getDeclaredMethod("getClassInstance", String.class).invoke(className));
+    public void getClassInstance() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+        assertEquals(TestClass.class.getName(), sReflectionService.toString().substring(0, sReflectionService.toString().lastIndexOf("@")));
     }
 
     @Test

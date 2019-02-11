@@ -5,6 +5,7 @@ import com.reflection.annotation.Column;
 import com.reflection.annotation.Table;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 
 public class QueryGenerator extends AbstractClassChecker {
 
@@ -32,20 +33,16 @@ public class QueryGenerator extends AbstractClassChecker {
     }
 
 
+    private Integer getValueObjectId(Object id) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
+        return getValueId(getClassByObject(id));
+
+    }
+
+
     public String delete(Class clazz, Object id) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
         return "DELETE " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE ID=" + getId(id);
     }
 
-    private String getTableName(Class<?> clazz) {
-        isClassExist(clazz.getName());
-
-        if (clazz.isAnnotationPresent(Table.class)) {
-            Table table = clazz.getAnnotation(Table.class);
-            return !table.name().equals("") ? table.name() : clazz.getSimpleName().toLowerCase();
-        }
-
-        throw new NullPointerException("Table name can't be a null");
-    }
 
     private String getColumnName(Field classField) {
         String columnName = classField.getAnnotation(Column.class).name();
@@ -87,7 +84,6 @@ public class QueryGenerator extends AbstractClassChecker {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (Field classField : getClassFields(clazz)) {
-
             if (classField.isAnnotationPresent(Column.class)) {
                 classField.setAccessible(true);
                 stringBuilder.append(getColumnName(classField)).append(", ");
@@ -111,10 +107,6 @@ public class QueryGenerator extends AbstractClassChecker {
         return value;
     }
 
-    private Integer getValueObjectId(Object id) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return getValueId(getClassByObject(id));
-
-    }
 
     private Integer getValueId(Object classByObject) throws IllegalAccessException, InstantiationException {
         for (Field classField : getClassFields((Class) classByObject)) {
@@ -126,6 +118,17 @@ public class QueryGenerator extends AbstractClassChecker {
             }
         }
         throw new IllegalArgumentException("No any ID fields");
+    }
+
+    private String getTableName(Class<?> clazz) {
+        isClassExist(clazz.getName());
+
+        if (clazz.isAnnotationPresent(Table.class)) {
+            Table table = clazz.getAnnotation(Table.class);
+            return !table.name().equals("") ? table.name() : clazz.getSimpleName().toLowerCase();
+        }
+
+        throw new NullPointerException("Table name can't be a null");
     }
 
 }

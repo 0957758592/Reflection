@@ -5,7 +5,8 @@
 /src/main/java/com/reflection/TestMain.java
 /src/main/java/com/reflection/X.java
 /src/main/java/com/reflection/myInterface.java
+/src/main/java/com/reflection/unzipProtected
 
 *.iml
-*.class
-*.txt
+    *.class
+    *.txt
