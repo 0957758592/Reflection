@@ -3,7 +3,7 @@ package com.reflection.reflectionService;
 import com.reflection.AbstractClassChecker;
 
 import java.lang.reflect.*;
-
+import java.util.StringJoiner;
 
 public class ReflectionService extends AbstractClassChecker {
 
@@ -24,19 +24,6 @@ public class ReflectionService extends AbstractClassChecker {
     public final void runMethodsWithoutParameters(Object object) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         checkIfIsNotNull(object);
         Class clazz = getInstanceOfObject(object);
-        Object instance = clazz.newInstance();
-
-        Field[] fields = getClassFields(clazz);
-
-        for (Field field : fields) {
-            field.setAccessible(true);
-            if (field.get(instance) == null) {
-
-                Object newValue = field.getType().cast(Integer.toString(111));
-                field.set(instance, newValue);
-            }
-            field.setAccessible(false);
-        }
 
         Method[] methods = getClassMethods(clazz);
 
@@ -46,14 +33,14 @@ public class ReflectionService extends AbstractClassChecker {
                 method.setAccessible(true);
             }
             if (method.getGenericParameterTypes().length == 0) {
-                method.invoke(instance);
+                method.invoke(clazz.newInstance());
             }
             method.setAccessible(false);
         }
     }
 
     //4
-    public void runMethodsWithSignatureFinal(Object object) throws InvocationTargetException, IllegalAccessException {
+    public void runMethodsWithSignatureFinal(Object object){
         checkIfIsNotNull(object);
 
         Class clazz = getInstanceOfObject(object);
@@ -71,10 +58,11 @@ public class ReflectionService extends AbstractClassChecker {
         isClassExist(clazz.getName());
 
         Method[] methods = getClassMethods(clazz);
-
+        StringJoiner sj = new StringJoiner(", ");
         for (Method method : methods) {
-            System.out.println(method);
+            sj.add(method.getName());
         }
+        System.out.print(sj.toString());
     }
 
     //6
@@ -83,12 +71,12 @@ public class ReflectionService extends AbstractClassChecker {
         isClassExist(clazz.getName());
 
         for (Class<?> aClass : clazz.getInterfaces()) {
-            System.out.println(aClass.getName());
+            System.out.print(aClass.getSimpleName() + " ");
         }
 
         if (clazz.getSuperclass() != null) {
             Class superClass = clazz.getSuperclass();
-            System.out.println(superClass.getSimpleName());
+            System.out.print(superClass.getSimpleName());
             pintAllClassRelativesAndInterfaces(superClass);
         }
 
@@ -108,7 +96,7 @@ public class ReflectionService extends AbstractClassChecker {
                 instance = clazz.newInstance();
 
                 field.setAccessible(true);
-
+                System.out.println(field.get(instance));
                 if (field.getType().equals(String.class)) {
                     field.set(instance, null);
                 } else if (field.getType().equals(Integer.class)) {
@@ -130,7 +118,7 @@ public class ReflectionService extends AbstractClassChecker {
                 } else if (field.getType().equals(Byte.class)) {
                     field.set(instance, (byte) 0);
                 }
-
+                System.out.println(field.get(instance));
                 field.setAccessible(false);
             }
         }
@@ -145,7 +133,7 @@ public class ReflectionService extends AbstractClassChecker {
 
     private void printModifier(Method method) {
         if (Modifier.isFinal(method.getModifiers())) {
-            System.out.println("la finale: " + Modifier.toString(method.getModifiers()));
+            System.out.print("la finale: " + method.getName() + " ");
         }
     }
 

@@ -1,12 +1,12 @@
 /.idea
 /target
 /src/main/resources
-/src/main/java/com/reflection/reflectionService/ReflectionServiceTest.java
+/src/main/java/com/reflection/reflectionService/ReflectionServiceTest2.java
 /src/main/java/com/reflection/TestMain.java
 /src/main/java/com/reflection/X.java
 /src/main/java/com/reflection/myInterface.java
 /src/main/java/com/reflection/unzipProtected
 
 *.iml
-    *.class
-    *.txt
+*.class
+*.txt

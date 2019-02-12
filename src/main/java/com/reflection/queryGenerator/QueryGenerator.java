@@ -5,11 +5,10 @@ import com.reflection.annotation.Column;
 import com.reflection.annotation.Table;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class QueryGenerator extends AbstractClassChecker {
 
-    public String getAll(Class<?> clazz) throws InstantiationException, IllegalAccessException {
+    public String getAll(Class<?> clazz){
         return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz);
     }
 
