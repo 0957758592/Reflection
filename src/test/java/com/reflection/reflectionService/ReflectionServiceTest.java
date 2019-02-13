@@ -67,7 +67,7 @@ public class ReflectionServiceTest {
     }
 
     @Test
-    public void modifyPrivateFields() throws InstantiationException, IllegalAccessException {
+    public void modifyPrivateFields() throws InstantiationException, IllegalAccessException, NoSuchFieldException {
         assertEquals("string", testClassTest.getString());
         assertEquals((Integer) Integer.MAX_VALUE, testClassTest.getInteger());
         assertEquals((Integer) 123, testClassTest.getInt());
@@ -79,18 +79,18 @@ public class ReflectionServiceTest {
         assertEquals(String.valueOf(2345), String.valueOf(testClassTest.getShortz()));
         assertEquals(String.valueOf(123), String.valueOf(testClassTest.getByte()));
 
-        sReflectionService.modifyPrivateFields(TestClassTest.class);
+        sReflectionService.modifyPrivateFields(testClassTest);
 
-//        assertEquals(null, testClassTest.getString());
-//        assertEquals(null, testClassTest.getInteger());
-//        assertEquals((Integer) 0, testClassTest.getInt());
-//        assertEquals(false, testClassTest.getBoolean());
-//        assertEquals(String.valueOf(0), testClassTest.getCharz());
-//        assertEquals((Double) 0.0, testClassTest.getDouble());
-//        assertEquals((Float) 0.0F, testClassTest.getFloat());
-//        assertEquals((Long) 0L, testClassTest.getLong());
-//        assertEquals(String.valueOf(0), String.valueOf(testClassTest.getShortz()));
-//        assertEquals(String.valueOf(0), String.valueOf(testClassTest.getByte()));
+        assertEquals(null, testClassTest.getString());
+        assertEquals((Integer) 0, testClassTest.getInteger());
+        assertEquals((Integer) 0, testClassTest.getInt());
+        assertEquals(false, testClassTest.getBoolean());
+        assertEquals((char) 0, (char) testClassTest.getCharz());
+        assertEquals((Double) 0.0, testClassTest.getDouble());
+        assertEquals((Float) 0.0F, testClassTest.getFloat());
+        assertEquals((Long) 0L, testClassTest.getLong());
+        assertEquals(String.valueOf(0), String.valueOf(testClassTest.getShortz()));
+        assertEquals(String.valueOf(0), String.valueOf(testClassTest.getByte()));
 
     }
 }

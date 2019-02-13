@@ -83,20 +83,18 @@ public class ReflectionService extends AbstractClassChecker {
     }
 
     //7
-    public void modifyPrivateFields(Class<?> clazz) throws IllegalAccessException, InstantiationException {
-        checkIfIsNotNull(clazz);
-        isClassExist(clazz.getName());
+    public void modifyPrivateFields(Object instance) throws IllegalAccessException, InstantiationException {
+        checkIfIsNotNull(instance.getClass());
+        isClassExist(instance.getClass().getName());
 
-        Field[] fields = getClassFields(clazz);
-        Object instance;
+        Field[] fields = getClassFields(instance.getClass());
 
         for (Field field : fields) {
 
             if (Modifier.isPrivate(field.getModifiers())) {
-                instance = clazz.newInstance();
 
                 field.setAccessible(true);
-                System.out.println(field.get(instance));
+
                 if (field.getType().equals(String.class)) {
                     field.set(instance, null);
                 } else if (field.getType().equals(Integer.class)) {
@@ -110,7 +108,7 @@ public class ReflectionService extends AbstractClassChecker {
                 } else if (field.getType().equals(Long.class)) {
                     field.set(instance, 0L);
                 } else if (field.getType().equals(Character.class)) {
-                    field.set(instance, (char) 0);
+                    field.set(instance,  (char) 0);
                 } else if (field.getType().equals(int.class)) {
                     field.set(instance, 0);
                 } else if (field.getType().equals(Short.class)) {
@@ -118,7 +116,6 @@ public class ReflectionService extends AbstractClassChecker {
                 } else if (field.getType().equals(Byte.class)) {
                     field.set(instance, (byte) 0);
                 }
-                System.out.println(field.get(instance));
                 field.setAccessible(false);
             }
         }
