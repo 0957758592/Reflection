@@ -1,45 +1,33 @@
 package com.reflection.queryGenerator;
 
-import com.reflection.AbstractClassChecker;
+import com.reflection.ClassChecker;
 import com.reflection.annotation.Column;
 import com.reflection.annotation.Table;
 
 import java.lang.reflect.Field;
 
-public class QueryGenerator extends AbstractClassChecker {
+public class QueryGenerator {
 
-    public String getAll(Class<?> clazz){
+    public String getAll(Class<?> clazz) {
         return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz);
     }
 
-    public String insert(Object value) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return "INSERT INTO " + getTableNameByObject(value) + " (" + getColumns(value) + ")" + " VALUES " + "(" + getValuesByObject(value) + ")";
+    public String insert(Object value) throws InstantiationException, IllegalAccessException {
+        Class<?> clazz = value.getClass();
+        return "INSERT INTO " + getTableName(clazz) + " (" + getFieldsName(clazz) + ")" + " VALUES " + "(" + getFieldsValue(clazz) + ")";
     }
 
-    public String update(Object value) throws ClassNotFoundException {
-        return "UPDATE " + getTableNameByObject(value) + " SET " + getColumns(value);
+    public String update(Object value) {
+        Class<?> clazz = value.getClass();
+        return "UPDATE " + getTableName(clazz) + " SET " + getFieldsName(clazz);
     }
 
-    public String getById(Class<?> clazz, Object id) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE ID=" + getId(id);
+    public String getById(Class<?> clazz, Object id) throws IllegalAccessException, InstantiationException {
+        return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(id.getClass()) + "=" + getId(id);
     }
 
-    private Integer getId(Object id) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        if (id instanceof Integer) {
-            return (Integer) id;
-        }
-        return getValueObjectId(id);
-    }
-
-
-    private Integer getValueObjectId(Object id) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-        return getValueId(getClassByObject(id));
-
-    }
-
-
-    public String delete(Class clazz, Object id) throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        return "DELETE " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE ID=" + getId(id);
+    public String delete(Class clazz, Object id) throws IllegalAccessException, InstantiationException {
+        return "DELETE " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(id.getClass()) + "=" + getId(id);
     }
 
 
@@ -48,26 +36,17 @@ public class QueryGenerator extends AbstractClassChecker {
         return !columnName.equals("") ? columnName : classField.getName();
     }
 
-    private String getColumns(Object value) throws ClassNotFoundException {
-        return getFieldsName((Class<?>) getClassByObject(value));
-    }
 
-    private String getTableNameByObject(Object value) throws ClassNotFoundException {
-        return getTableName((Class<?>) getClassByObject(value));
-    }
-
-
-    private String getValuesByObject(Object value) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        return getObjectValue((Class) getClassByObject(value));
-    }
-
-    private String getObjectValue(Class classByObject) throws InstantiationException, IllegalAccessException {
-        return getFieldsValue(classByObject);
+    private String getId(Object id) throws InstantiationException, IllegalAccessException {
+        if (id instanceof Integer) {
+            return String.valueOf(id);
+        }
+        return getValueId(id);
     }
 
     private String getFieldsValue(Class classByObject) throws IllegalAccessException, InstantiationException {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Field classField : getClassFields(classByObject)) {
+        for (Field classField : ClassChecker.getClassFields(classByObject)) {
             if (classField.isAnnotationPresent(Column.class)) {
                 classField.setAccessible(true);
                 stringBuilder.append(classField.get(classByObject.newInstance())).append(", ");
@@ -82,7 +61,7 @@ public class QueryGenerator extends AbstractClassChecker {
     private String getFieldsName(Class<?> clazz) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (Field classField : getClassFields(clazz)) {
+        for (Field classField : ClassChecker.getClassFields(clazz)) {
             if (classField.isAnnotationPresent(Column.class)) {
                 classField.setAccessible(true);
                 stringBuilder.append(getColumnName(classField)).append(", ");
@@ -95,39 +74,43 @@ public class QueryGenerator extends AbstractClassChecker {
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
     }
 
-    private Object getClassByObject(Object value) throws ClassNotFoundException {
-        if (!(value instanceof Class)) {
-            if (value instanceof String) {
-                value = Class.forName(value.toString());
-            } else {
-                value = value.getClass();
+    private String getPrimaryName(Class<?> clazz) {
+
+        for (Field classField : ClassChecker.getClassFields(clazz)) {
+            if (classField.isAnnotationPresent(Column.class)) {
+                classField.setAccessible(true);
+                Column column = classField.getAnnotation(Column.class);
+                if (column.primary()) {
+                    classField.setAccessible(true);
+                    return column.name().equals("") ? classField.getName().toLowerCase() : column.name();
+                }
             }
         }
-        return value;
+
+        throw new RuntimeException("The primary name for " + clazz.getName() + " is not exist");
     }
 
+    private String getTableName(Class<?> clazz) {
 
-    private Integer getValueId(Object classByObject) throws IllegalAccessException, InstantiationException {
-        for (Field classField : getClassFields((Class) classByObject)) {
+        if (clazz.isAnnotationPresent(Table.class)) {
+            Table table = clazz.getAnnotation(Table.class);
+            return table.name().equals("") ? clazz.getSimpleName().toLowerCase() : table.name();
+        }
+
+        throw new RuntimeException("The Object " + clazz.getName() + " can't be used as table, annotation @Table is not exist");
+    }
+
+    private String getValueId(Object classByObject) throws IllegalAccessException, InstantiationException {
+        for (Field classField : ClassChecker.getClassFields(classByObject.getClass())) {
             if (classField.isAnnotationPresent(Column.class)) {
                 if (classField.getName().equals("id")) {
                     classField.setAccessible(true);
-                    return (Integer) classField.get(((Class) classByObject).newInstance());
+                    return classField.get((classByObject.getClass()).newInstance()).toString();
                 }
             }
         }
         throw new IllegalArgumentException("No any ID fields");
     }
 
-    private String getTableName(Class<?> clazz) {
-        isClassExist(clazz.getName());
-
-        if (clazz.isAnnotationPresent(Table.class)) {
-            Table table = clazz.getAnnotation(Table.class);
-            return !table.name().equals("") ? table.name() : clazz.getSimpleName().toLowerCase();
-        }
-
-        throw new NullPointerException("Table name can't be a null");
-    }
 
 }

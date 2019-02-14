@@ -1,49 +1,47 @@
 package com.reflection.reflectionService;
 
-import com.reflection.AbstractClassChecker;
+import com.reflection.ClassChecker;
 
 import java.lang.reflect.*;
 import java.util.StringJoiner;
 
-public class ReflectionService extends AbstractClassChecker {
+public class ReflectionService {
 
     //1
     public Object getClassInstance(String name) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         checkIfIsNotNull(name);
-        isClassExist(name);
         return Class.forName(name).newInstance();
     }
 
-    //2 ???
+    //2
     public Object getClassObject(Class<?> clazz) throws IllegalAccessException, InstantiationException {
-        isClassExist(clazz.getName());
         return clazz.newInstance();
     }
 
     //3
     public final void runMethodsWithoutParameters(Object object) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         checkIfIsNotNull(object);
-        Class clazz = getInstanceOfObject(object);
+        Class clazz = getClass(object);
 
-        Method[] methods = getClassMethods(clazz);
+        Method[] methods = getClassMethods(object.getClass());
 
         for (Method method : methods) {
 
             if (Modifier.isPrivate(method.getModifiers())) {
                 method.setAccessible(true);
+                if (method.getParameterCount() == 0) {
+                    method.invoke(object);
+                }
+                method.setAccessible(false);
             }
-            if (method.getGenericParameterTypes().length == 0) {
-                method.invoke(clazz.newInstance());
-            }
-            method.setAccessible(false);
         }
     }
 
     //4
-    public void runMethodsWithSignatureFinal(Object object){
+    public void printMethodsWithSignatureFinal(Object object) {
         checkIfIsNotNull(object);
 
-        Class clazz = getInstanceOfObject(object);
+        Class clazz = getClass(object);
 
         Method[] methods = getClassMethods(clazz);
 
@@ -53,14 +51,15 @@ public class ReflectionService extends AbstractClassChecker {
     }
 
     //5
-    public void printAllClassDeclaredMethods(Class<?> clazz) {
+    public void printAllPrivateMethods(Class<?> clazz) {
         checkIfIsNotNull(clazz);
-        isClassExist(clazz.getName());
 
         Method[] methods = getClassMethods(clazz);
         StringJoiner sj = new StringJoiner(", ");
         for (Method method : methods) {
-            sj.add(method.getName());
+            if (Modifier.isPrivate(method.getModifiers())) {
+                sj.add(method.getName());
+            }
         }
         System.out.print(sj.toString());
     }
@@ -68,7 +67,6 @@ public class ReflectionService extends AbstractClassChecker {
     //6
     public void pintAllClassRelativesAndInterfaces(Class<?> clazz) {
         checkIfIsNotNull(clazz);
-        isClassExist(clazz.getName());
 
         for (Class<?> aClass : clazz.getInterfaces()) {
             System.out.print(aClass.getSimpleName() + " ");
@@ -83,11 +81,10 @@ public class ReflectionService extends AbstractClassChecker {
     }
 
     //7
-    public void modifyPrivateFields(Object instance) throws IllegalAccessException, InstantiationException {
-        checkIfIsNotNull(instance.getClass());
-        isClassExist(instance.getClass().getName());
+    public void modifyPrivateFields(Object instance) throws IllegalAccessException {
+        checkIfIsNotNull(instance);
 
-        Field[] fields = getClassFields(instance.getClass());
+        Field[] fields = ClassChecker.getClassFields(instance.getClass());
 
         for (Field field : fields) {
 
@@ -99,23 +96,36 @@ public class ReflectionService extends AbstractClassChecker {
                     field.set(instance, null);
                 } else if (field.getType().equals(Integer.class)) {
                     field.set(instance, 0);
+                } else if (field.getType().equals(int.class)) {
+                    field.set(instance, 0);
                 } else if (field.getType().equals(Boolean.class)) {
                     field.set(instance, false);
+                } else if (field.getType().equals(boolean.class)) {
+                    field.set(instance, false);
                 } else if (field.getType().equals(Double.class)) {
+                    field.set(instance, 0.0);
+                } else if (field.getType().equals(double.class)) {
                     field.set(instance, 0.0);
                 } else if (field.getType().equals(Float.class)) {
                     field.set(instance, 0f);
                 } else if (field.getType().equals(Long.class)) {
                     field.set(instance, 0L);
                 } else if (field.getType().equals(Character.class)) {
-                    field.set(instance,  (char) 0);
-                } else if (field.getType().equals(int.class)) {
-                    field.set(instance, 0);
+                    field.set(instance, (char) 0);
+                } else if (field.getType().equals(char.class)) {
+                    field.set(instance, (char) 0);
                 } else if (field.getType().equals(Short.class)) {
+                    field.set(instance, (short) 0);
+                } else if (field.getType().equals(short.class)) {
                     field.set(instance, (short) 0);
                 } else if (field.getType().equals(Byte.class)) {
                     field.set(instance, (byte) 0);
+                } else if (field.getType().equals(byte.class)) {
+                    field.set(instance, (byte) 0);
+                } else {
+                    field.set(instance, null);
                 }
+
                 field.setAccessible(false);
             }
         }
@@ -130,11 +140,19 @@ public class ReflectionService extends AbstractClassChecker {
 
     private void printModifier(Method method) {
         if (Modifier.isFinal(method.getModifiers())) {
-            System.out.print("la finale: " + method.getName() + " ");
+            if (method.getParameterCount() == 0) {
+                System.out.print("la finale: " + method.getName() + " ");
+            } else {
+                StringJoiner sj = new StringJoiner(", ", "(", ")");
+                for (Class<?> parameterType : method.getParameterTypes()) {
+                    sj.add(parameterType.getSimpleName());
+                }
+                System.out.println(method.getName() + sj);
+            }
         }
     }
 
-    private Class getInstanceOfObject(Object object) {
+    private Class getClass(Object object) {
         return (object instanceof Class) ? (Class) object : object.getClass();
     }
 

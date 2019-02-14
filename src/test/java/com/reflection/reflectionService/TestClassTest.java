@@ -63,6 +63,10 @@ class TestClassTest implements InterfaceTest {
         return bytez;
     }
 
+    private Byte getBytes() {
+        return bytez;
+    }
+
     final void printMe() {
         System.out.println("private final void printMe");
     }

@@ -17,7 +17,7 @@ public class ReflectionServiceTest {
 
     private String className = TestClassTest.class.getName();
     private ReflectionService sReflectionService;
-    TestClassTest testClassTest = new TestClassTest();
+    private TestClassTest testClassTest = new TestClassTest();
 
     @Before
     public void before() {
@@ -50,14 +50,14 @@ public class ReflectionServiceTest {
 
     @Test
     public void runMethodsWithSignatureFinal() {
-        sReflectionService.runMethodsWithSignatureFinal(testClassTest);
+        sReflectionService.printMethodsWithSignatureFinal(testClassTest);
         assertEquals("la finale: printMe la finale: printMeAgain ", outContent.toString());
     }
 
     @Test
     public void printAllClassDeclaredMethods() {
-        sReflectionService.printAllClassDeclaredMethods(testClassTest.getClass());
-        assertEquals("getString, getCharz, getShortz, printMe, printMeAgain, getBoolean, getByte, getInt, getLong, getFloat, getDouble, getInteger", outContent.toString());
+        sReflectionService.printAllPrivateMethods(testClassTest.getClass());
+        assertEquals("getBytes", outContent.toString());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class ReflectionServiceTest {
     }
 
     @Test
-    public void modifyPrivateFields() throws InstantiationException, IllegalAccessException, NoSuchFieldException {
+    public void modifyPrivateFields() throws InstantiationException, IllegalAccessException{
         assertEquals("string", testClassTest.getString());
         assertEquals((Integer) Integer.MAX_VALUE, testClassTest.getInteger());
         assertEquals((Integer) 123, testClassTest.getInt());
@@ -81,7 +81,7 @@ public class ReflectionServiceTest {
 
         sReflectionService.modifyPrivateFields(testClassTest);
 
-        assertEquals(null, testClassTest.getString());
+        assertNull(testClassTest.getString());
         assertEquals((Integer) 0, testClassTest.getInteger());
         assertEquals((Integer) 0, testClassTest.getInt());
         assertEquals(false, testClassTest.getBoolean());
