@@ -23,7 +23,7 @@ public class ReflectionService {
         checkIfIsNotNull(object);
         Class clazz = getClass(object);
 
-        Method[] methods = getClassMethods(object.getClass());
+        Method[] methods = getClassMethods(clazz);
 
         for (Method method : methods) {
 

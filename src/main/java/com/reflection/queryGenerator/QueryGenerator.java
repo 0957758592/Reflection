@@ -33,7 +33,7 @@ public class QueryGenerator {
 
     private String getColumnName(Field classField) {
         String columnName = classField.getAnnotation(Column.class).name();
-        return !columnName.equals("") ? columnName : classField.getName();
+        return columnName.equals("") ? classField.getName() : columnName;
     }
 
 
@@ -111,6 +111,5 @@ public class QueryGenerator {
         }
         throw new IllegalArgumentException("No any ID fields");
     }
-
 
 }
