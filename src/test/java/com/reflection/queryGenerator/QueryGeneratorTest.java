@@ -31,8 +31,9 @@ public class QueryGeneratorTest {
     }
 
     @Test
-    public void insert() throws InstantiationException, IllegalAccessException {
-        assertEquals("SELECT (id, firstName, salary) FROM TableName WHERE id=0", queryGenerator.getById(Persons.class, persons));
+    public void insert(){
+        String email = "123@123.123";
+        assertEquals("SELECT (id, firstName, salary) FROM TableName WHERE id=123@123.123", queryGenerator.getById(Persons.class, email));
     }
 
     @Test
@@ -46,7 +47,8 @@ public class QueryGeneratorTest {
     }
 
     @Test
-    public void delete() throws InstantiationException, IllegalAccessException {
-        assertEquals("DELETE (id, firstName, salary) FROM TableName WHERE id=0", queryGenerator.delete(Persons.class, persons));
+    public void delete(){
+        Long digits = 987654321987654321L;
+        assertEquals("DELETE (id, firstName, salary) FROM TableName WHERE id=987654321987654321", queryGenerator.delete(Persons.class, digits));
     }
 }

@@ -5,6 +5,12 @@ class TestClassTest implements InterfaceTest {
     private String string = "string";
     private Integer integer = Integer.MAX_VALUE;
     private int intz = 123;
+    private boolean boolzz = true;
+    private short shortzz = 123;
+    private long longzz = 987654321987L;
+    private double doublezz = 123.123;
+    private float floatzz = 123.123F;
+    private char charzz = 'a';
     private Character charz = 'c';
     private Boolean bool = true;
     private Double doublez = 55.21;
@@ -12,6 +18,30 @@ class TestClassTest implements InterfaceTest {
     private Long longz = 9876543216549L;
     private Short shortz = 2345;
     private Byte bytez = 123;
+
+    public boolean isBoolzz() {
+        return boolzz;
+    }
+
+    public short getShortzz() {
+        return shortzz;
+    }
+
+    public long getLongzz() {
+        return longzz;
+    }
+
+    public double getDoublezz() {
+        return doublezz;
+    }
+
+    public float getFloatzz() {
+        return floatzz;
+    }
+
+    public char getCharzz() {
+        return charzz;
+    }
 
     @Override
     public Character getCharz() {

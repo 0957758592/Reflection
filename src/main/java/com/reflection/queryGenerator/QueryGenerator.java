@@ -22,12 +22,12 @@ public class QueryGenerator {
         return "UPDATE " + getTableName(clazz) + " SET " + getFieldsName(clazz);
     }
 
-    public String getById(Class<?> clazz, Object id) throws IllegalAccessException, InstantiationException {
-        return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(id.getClass()) + "=" + getId(id);
+    public String getById(Class<?> clazz, Object id){
+        return "SELECT " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(clazz) + "=" + id;
     }
 
-    public String delete(Class clazz, Object id) throws IllegalAccessException, InstantiationException {
-        return "DELETE " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(id.getClass()) + "=" + getId(id);
+    public String delete(Class clazz, Object id){
+        return "DELETE " + "(" + getFieldsName(clazz) + ") FROM " + getTableName(clazz) + " WHERE " + getPrimaryName(clazz) + "=" + id;
     }
 
 
@@ -36,13 +36,6 @@ public class QueryGenerator {
         return columnName.equals("") ? classField.getName() : columnName;
     }
 
-
-    private String getId(Object id) throws InstantiationException, IllegalAccessException {
-        if (id instanceof Integer) {
-            return String.valueOf(id);
-        }
-        return getValueId(id);
-    }
 
     private String getFieldsValue(Class classByObject) throws IllegalAccessException, InstantiationException {
         StringBuilder stringBuilder = new StringBuilder();
@@ -98,18 +91,6 @@ public class QueryGenerator {
         }
 
         throw new RuntimeException("The Object " + clazz.getName() + " can't be used as table, annotation @Table is not exist");
-    }
-
-    private String getValueId(Object classByObject) throws IllegalAccessException, InstantiationException {
-        for (Field classField : ClassChecker.getClassFields(classByObject.getClass())) {
-            if (classField.isAnnotationPresent(Column.class)) {
-                if (classField.getName().equals("id")) {
-                    classField.setAccessible(true);
-                    return classField.get((classByObject.getClass()).newInstance()).toString();
-                }
-            }
-        }
-        throw new IllegalArgumentException("No any ID fields");
     }
 
 }

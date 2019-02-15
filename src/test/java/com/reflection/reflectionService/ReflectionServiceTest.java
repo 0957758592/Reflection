@@ -67,7 +67,7 @@ public class ReflectionServiceTest {
     }
 
     @Test
-    public void modifyPrivateFields() throws InstantiationException, IllegalAccessException{
+    public void modifyPrivateFields() throws IllegalAccessException{
         assertEquals("string", testClassTest.getString());
         assertEquals((Integer) Integer.MAX_VALUE, testClassTest.getInteger());
         assertEquals((Integer) 123, testClassTest.getInt());
