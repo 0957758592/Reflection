@@ -49,8 +49,8 @@ public class ReflectionServiceTest {
     }
 
     @Test
-    public void runMethodsWithSignatureFinal() {
-        sReflectionService.printMethodsWithSignatureFinal(testClassTest);
+    public void printFinalSignatureMethods() {
+        sReflectionService.printFinalSignatureMethods(testClassTest);
         assertEquals("la finale: printMe la finale: printMeAgain ", outContent.toString());
     }
 

@@ -1,6 +1,5 @@
 package com.reflection.queryGenerator;
 
-import com.reflection.ClassChecker;
 import com.reflection.annotation.Column;
 import com.reflection.annotation.Table;
 
@@ -14,12 +13,12 @@ public class QueryGenerator {
 
     public String insert(Object value) throws InstantiationException, IllegalAccessException {
         Class<?> clazz = value.getClass();
-        return "INSERT INTO " + getTableName(clazz) + " (" + getFieldsName(clazz) + ")" + " VALUES " + "(" + getFieldsValue(clazz) + ")";
+        return "INSERT INTO " + getTableName(clazz) + " (" + getFieldsName(clazz) + ")" + " VALUES " + "(" + getFieldsValue(value.getClass()) + ")";
     }
 
     public String update(Object value) {
         Class<?> clazz = value.getClass();
-        return "UPDATE " + getTableName(clazz) + " SET " + getFieldsName(clazz);
+        return "UPDATE " + getTableName(clazz) + " SET " + getFieldsName(value.getClass());
     }
 
     public String getById(Class<?> clazz, Object id){
@@ -39,13 +38,11 @@ public class QueryGenerator {
 
     private String getFieldsValue(Class classByObject) throws IllegalAccessException, InstantiationException {
         StringBuilder stringBuilder = new StringBuilder();
-        for (Field classField : ClassChecker.getClassFields(classByObject)) {
+        for (Field classField : classByObject.getDeclaredFields()) {
             if (classField.isAnnotationPresent(Column.class)) {
                 classField.setAccessible(true);
                 stringBuilder.append(classField.get(classByObject.newInstance())).append(", ");
                 classField.setAccessible(false);
-            } else {
-                throw new NullPointerException("Table name can't be a null");
             }
         }
         return stringBuilder.substring(0, stringBuilder.lastIndexOf(","));
@@ -54,13 +51,9 @@ public class QueryGenerator {
     private String getFieldsName(Class<?> clazz) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (Field classField : ClassChecker.getClassFields(clazz)) {
+        for (Field classField : clazz.getDeclaredFields()) {
             if (classField.isAnnotationPresent(Column.class)) {
-                classField.setAccessible(true);
                 stringBuilder.append(getColumnName(classField)).append(", ");
-                classField.setAccessible(false);
-            } else {
-                throw new NullPointerException("Column name can't be a null");
             }
         }
 
@@ -69,12 +62,10 @@ public class QueryGenerator {
 
     private String getPrimaryName(Class<?> clazz) {
 
-        for (Field classField : ClassChecker.getClassFields(clazz)) {
+        for (Field classField : clazz.getDeclaredFields()) {
             if (classField.isAnnotationPresent(Column.class)) {
-                classField.setAccessible(true);
                 Column column = classField.getAnnotation(Column.class);
                 if (column.primary()) {
-                    classField.setAccessible(true);
                     return column.name().equals("") ? classField.getName().toLowerCase() : column.name();
                 }
             }

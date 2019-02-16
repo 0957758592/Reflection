@@ -1,7 +1,5 @@
 package com.reflection.reflectionService;
 
-import com.reflection.ClassChecker;
-
 import java.lang.reflect.*;
 import java.util.StringJoiner;
 
@@ -15,35 +13,31 @@ public class ReflectionService {
 
     //2
     public Object getClassObject(Class<?> clazz) throws IllegalAccessException, InstantiationException {
+        checkIfIsNotNull(clazz);
         return clazz.newInstance();
     }
 
     //3
-    public final void runMethodsWithoutParameters(Object object) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public final void runMethodsWithoutParameters(Object object) throws InvocationTargetException, IllegalAccessException {
         checkIfIsNotNull(object);
-        Class clazz = getClass(object);
 
-        Method[] methods = getClassMethods(clazz);
+        Method[] methods = getClassMethods(object.getClass());
 
         for (Method method : methods) {
-
-            if (Modifier.isPrivate(method.getModifiers())) {
-                method.setAccessible(true);
-                if (method.getParameterCount() == 0) {
-                    method.invoke(object);
+            if (method.getParameterCount() == 0) {
+                if (Modifier.isPrivate(method.getModifiers())) {
+                    method.setAccessible(true);
                 }
-                method.setAccessible(false);
+                method.invoke(object);
             }
         }
     }
 
     //4
-    public void printMethodsWithSignatureFinal(Object object) {
+    public void printFinalSignatureMethods(Object object) {
         checkIfIsNotNull(object);
 
-        Class clazz = getClass(object);
-
-        Method[] methods = getClassMethods(clazz);
+        Method[] methods = getClassMethods(object.getClass());
 
         for (Method method : methods) {
             printModifier(method);
@@ -84,7 +78,7 @@ public class ReflectionService {
     public void modifyPrivateFields(Object instance) throws IllegalAccessException {
         checkIfIsNotNull(instance);
 
-        Field[] fields = ClassChecker.getClassFields(instance.getClass());
+        Field[] fields = instance.getClass().getDeclaredFields();
 
         for (Field field : fields) {
 
@@ -108,7 +102,11 @@ public class ReflectionService {
                     field.set(instance, 0.0);
                 } else if (field.getType().equals(Float.class)) {
                     field.set(instance, 0f);
+                } else if (field.getType().equals(float.class)) {
+                    field.set(instance, 0f);
                 } else if (field.getType().equals(Long.class)) {
+                    field.set(instance, 0L);
+                } else if (field.getType().equals(long.class)) {
                     field.set(instance, 0L);
                 } else if (field.getType().equals(Character.class)) {
                     field.set(instance, (char) 0);
@@ -150,10 +148,6 @@ public class ReflectionService {
                 System.out.println(method.getName() + sj);
             }
         }
-    }
-
-    private Class getClass(Object object) {
-        return (object instanceof Class) ? (Class) object : object.getClass();
     }
 
 
