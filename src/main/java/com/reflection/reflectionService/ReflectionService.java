@@ -21,9 +21,7 @@ public class ReflectionService {
     public final void runMethodsWithoutParameters(Object object) throws InvocationTargetException, IllegalAccessException {
         checkIfIsNotNull(object);
 
-        Method[] methods = getClassMethods(object.getClass());
-
-        for (Method method : methods) {
+        for (Method method : object.getClass().getDeclaredMethods()) {
             if (method.getParameterCount() == 0) {
                 if (Modifier.isPrivate(method.getModifiers())) {
                     method.setAccessible(true);
@@ -34,13 +32,11 @@ public class ReflectionService {
     }
 
     //4
-    public void printFinalSignatureMethods(Object object) {
+    public void printFinalMethodsSignature(Object object) {
         checkIfIsNotNull(object);
 
-        Method[] methods = getClassMethods(object.getClass());
-
-        for (Method method : methods) {
-            printModifier(method);
+        for (Method method : object.getClass().getDeclaredMethods()) {
+            printSignatures(method);
         }
     }
 
@@ -48,14 +44,13 @@ public class ReflectionService {
     public void printAllPrivateMethods(Class<?> clazz) {
         checkIfIsNotNull(clazz);
 
-        Method[] methods = getClassMethods(clazz);
         StringJoiner sj = new StringJoiner(", ");
-        for (Method method : methods) {
+        for (Method method : clazz.getDeclaredMethods()) {
             if (Modifier.isPrivate(method.getModifiers())) {
                 sj.add(method.getName());
             }
         }
-        System.out.print(sj.toString());
+        System.out.println(sj.toString());
     }
 
     //6
@@ -63,12 +58,12 @@ public class ReflectionService {
         checkIfIsNotNull(clazz);
 
         for (Class<?> aClass : clazz.getInterfaces()) {
-            System.out.print(aClass.getSimpleName() + " ");
+            System.out.println(aClass.getSimpleName());
         }
 
         if (clazz.getSuperclass() != null) {
             Class superClass = clazz.getSuperclass();
-            System.out.print(superClass.getSimpleName());
+            System.out.println(superClass.getSimpleName());
             pintAllClassRelativesAndInterfaces(superClass);
         }
 
@@ -136,29 +131,15 @@ public class ReflectionService {
         }
     }
 
-    private void printModifier(Method method) {
+    private void printSignatures(Method method) {
         if (Modifier.isFinal(method.getModifiers())) {
-            if (method.getParameterCount() == 0) {
-                System.out.print("la finale: " + method.getName() + " ");
-            } else {
-                StringJoiner sj = new StringJoiner(", ", "(", ")");
-                for (Class<?> parameterType : method.getParameterTypes()) {
-                    sj.add(parameterType.getSimpleName());
-                }
-                System.out.println(method.getName() + sj);
+            StringJoiner sj = new StringJoiner(", ", "(", ")");
+            for (Class<?> parameterType : method.getParameterTypes()) {
+                sj.add(parameterType.getSimpleName());
             }
+            System.out.println(method.getName() + sj);
+
         }
     }
-
-
-    private Method[] getClassMethods(Class clazz) {
-        Method[] methods = clazz.getDeclaredMethods();
-
-        if (methods == null) {
-            throw new NullPointerException("There are no any methods at the class");
-        }
-        return methods;
-    }
-
 
 }

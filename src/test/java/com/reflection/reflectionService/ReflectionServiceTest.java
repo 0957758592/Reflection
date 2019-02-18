@@ -49,21 +49,21 @@ public class ReflectionServiceTest {
     }
 
     @Test
-    public void printFinalSignatureMethods() {
-        sReflectionService.printFinalSignatureMethods(testClassTest);
-        assertEquals("la finale: printMe la finale: printMeAgain ", outContent.toString());
+    public void printFinalMethodsSignature() {
+        sReflectionService.printFinalMethodsSignature(testClassTest);
+        assertEquals("printMe()\nprintMeAgain()\n", outContent.toString());
     }
 
     @Test
     public void printAllClassDeclaredMethods() {
         sReflectionService.printAllPrivateMethods(testClassTest.getClass());
-        assertEquals("getBytes", outContent.toString());
+        assertEquals("getBytes\n", outContent.toString());
     }
 
     @Test
     public void pintAllClassRelativesAndInterfaces() {
         sReflectionService.pintAllClassRelativesAndInterfaces(testClassTest.getClass());
-        assertEquals("InterfaceTest Object", outContent.toString());
+        assertEquals("InterfaceTest\nObject\n", outContent.toString());
     }
 
     @Test
