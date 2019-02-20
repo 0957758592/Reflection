@@ -23,7 +23,7 @@ public class ReflectionService {
 
         for (Method method : object.getClass().getDeclaredMethods()) {
             if (method.getParameterCount() == 0) {
-                if (Modifier.isPrivate(method.getModifiers())) {
+                if (Modifier.isPrivate(method.getModifiers()) || Modifier.isFinal(method.getModifiers())) {
                     method.setAccessible(true);
                 }
                 method.invoke(object);
@@ -44,13 +44,11 @@ public class ReflectionService {
     public void printAllPrivateMethods(Class<?> clazz) {
         checkIfIsNotNull(clazz);
 
-        StringJoiner sj = new StringJoiner(", ");
         for (Method method : clazz.getDeclaredMethods()) {
-            if (Modifier.isPrivate(method.getModifiers())) {
-                sj.add(method.getName());
+            if (!Modifier.isPublic(method.getModifiers())) {
+                printMethodsAndParameters(method);
             }
         }
-        System.out.println(sj.toString());
     }
 
     //6
@@ -81,40 +79,38 @@ public class ReflectionService {
 
                 field.setAccessible(true);
 
-                if (field.getType().equals(String.class)) {
-                    field.set(instance, null);
-                } else if (field.getType().equals(Integer.class)) {
+                if (field.getType().equals(Integer.class)) {
                     field.set(instance, 0);
                 } else if (field.getType().equals(int.class)) {
-                    field.set(instance, 0);
+                    field.setInt(instance, 0);
                 } else if (field.getType().equals(Boolean.class)) {
                     field.set(instance, false);
                 } else if (field.getType().equals(boolean.class)) {
-                    field.set(instance, false);
+                    field.setBoolean(instance, false);
                 } else if (field.getType().equals(Double.class)) {
                     field.set(instance, 0.0);
                 } else if (field.getType().equals(double.class)) {
-                    field.set(instance, 0.0);
+                    field.setDouble(instance, 0.0);
                 } else if (field.getType().equals(Float.class)) {
                     field.set(instance, 0f);
                 } else if (field.getType().equals(float.class)) {
-                    field.set(instance, 0f);
+                    field.setFloat(instance, 0f);
                 } else if (field.getType().equals(Long.class)) {
                     field.set(instance, 0L);
                 } else if (field.getType().equals(long.class)) {
-                    field.set(instance, 0L);
+                    field.setLong(instance, 0L);
                 } else if (field.getType().equals(Character.class)) {
                     field.set(instance, (char) 0);
                 } else if (field.getType().equals(char.class)) {
-                    field.set(instance, (char) 0);
+                    field.setChar(instance, (char) 0);
                 } else if (field.getType().equals(Short.class)) {
                     field.set(instance, (short) 0);
                 } else if (field.getType().equals(short.class)) {
-                    field.set(instance, (short) 0);
+                    field.setShort(instance, (short) 0);
                 } else if (field.getType().equals(Byte.class)) {
                     field.set(instance, (byte) 0);
                 } else if (field.getType().equals(byte.class)) {
-                    field.set(instance, (byte) 0);
+                    field.setByte(instance, (byte) 0);
                 } else {
                     field.set(instance, null);
                 }
@@ -133,13 +129,17 @@ public class ReflectionService {
 
     private void printSignatures(Method method) {
         if (Modifier.isFinal(method.getModifiers())) {
-            StringJoiner sj = new StringJoiner(", ", "(", ")");
-            for (Class<?> parameterType : method.getParameterTypes()) {
-                sj.add(parameterType.getSimpleName());
-            }
-            System.out.println(method.getName() + sj);
+            printMethodsAndParameters(method);
 
         }
+    }
+
+    private void printMethodsAndParameters(Method method) {
+        StringJoiner sj = new StringJoiner(", ", "(", ")");
+        for (Class<?> parameterType : method.getParameterTypes()) {
+            sj.add(parameterType.getSimpleName());
+        }
+        System.out.println(method.getName() + sj);
     }
 
 }

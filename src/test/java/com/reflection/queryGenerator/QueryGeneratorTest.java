@@ -49,7 +49,7 @@ public class QueryGeneratorTest {
         }
 
         @Test
-        public void insert() throws IllegalAccessException, InstantiationException {
+        public void insert() throws IllegalAccessException {
             assertEquals(INSERT, queryGenerator.insert(person));
         }
 
